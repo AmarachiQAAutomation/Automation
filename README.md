@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Jira Clone tests
 
 ## Installation
@@ -23,3 +24,6 @@ npx cypress run --browser=chrome
 ## Observe test run results in CI
 [![N|BuildStatus](https://iili.io/QOkZWQ.png)](https://freeimage.host/i/QOkZWQ)
 
+=======
+# Automation
+>>>>>>> e923c71ecfc44fe986bf9f11d529f539744dcc3e
