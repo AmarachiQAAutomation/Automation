@@ -1,3 +1,6 @@
+// Import Faker
+const faker = require('faker')
+
 describe('Issue create', () => {
   beforeEach(() => {
     cy.visit('/');
@@ -84,6 +87,121 @@ describe('Issue create', () => {
 
       // Assert that correct error message is visible
       cy.get('[data-testid="form-field:title"]').should('contain', 'This field is required');
-    });
+
+    })
+ })
+ it('Should create a Bug issue and validate it successfully', () => {
+       //  Ensure Modal is visible 
+       cy.get('[data-testid="modal:issue-create"]', { timeout: 60000 }).within(() => {
+        
+        //Type value to the descrption input field
+        cy.get('.ql-editor').type('My bug description');
+        cy.get('.ql-editor').should('have.text', 'My bug description')
+      
+            // type value to the title input field
+         cy.get('input[name="title"]').type('Bug');
+         cy.get('input[name="title"]').should('have.value','Bug')
+      
+      // Open issue type dropdown and choose Bug
+       cy.get('[data-testid="select:type"]').click();
+       cy.get('[data-testid="select-option:Bug"]').wait(10000).trigger('mouseover').trigger('click');
+       cy.get('[data-testid="icon:bug"]').should('be.visible');
+
+       //Set priority to the Highest
+       cy.get('[data-testid="select:priority"]').click();
+       cy.get('[data-testid="select-option:Highest"]').click()
+
+       // select Pickle Rick as reporter
+       cy.get('[data-testid="select:reporterId"]').click();
+       cy.get('[data-testid="select-option:Pickle Rick"]').click();
+
+       //  select Lord Gaben as assignee 
+       cy.get('[data-testid="form-field:userIds"]').click();
+       cy.get('[data-testid="select-option:Lord Gaben"]').click();
+
+       // Click on button "Create issue button"
+       cy.get('button[type="submit"]').click({ force: true });
+      })
+    // Add delay to wait for modal to close
+        cy.wait(5000)
+      
+    // Assert that modal window is closed and successful message is visible
+      cy.log('Asserting the modal is closed and success message is visible')
+      cy.get ('[data-testid="modal:issue-create"]').should('exist')
+      cy.contains('Issue has been successfully created.', { timeout: 60000 }).should('be.visible')
+
+    // Reload the page to see the recently created issue
+       cy.reload()
+       cy.contains('issue has been successfully created.').should('not.exist')
+      
+      // Assert that the issue is in the backlog list
+       cy.get('[data-testid="board-list:backlog"]')
+      .should('be.visible')
+      .and('have.length', '1')
+      .within(() => {
+        cy.get('[data-testid="list-issue"]')
+        .should('have.length', '5')
+        .first()
+        .find('p')
+        .contains('Bug')
+        .siblings()
+        .within(() => {
+         cy.get('[data-testid="avatar:Lord Gaben"]').should('be.visible')
+         cy.get('[data-testid="icon:bug"]').should('be.visible')
+        })
+      })
+   })  
+  
+it('Should create a Task issue with random data and validate it successfully', () => {
+   // Generate random title and description
+    const randomTitle = faker.lorem.word(6)
+    const randomDescription = faker.lorem.words(8)
+    // Ensure modal is visible
+     cy.get('[data-testid="modal:issue-create"]', { timeout: 60000 }).within(() => {
+     //Fill in description
+     cy.get('.ql-editor').type(randomDescription)
+     cy.get('.ql-editor').should('have.text', randomDescription)
+
+    // Fill in title
+     cy.get('input[name="title"]').type(randomTitle)
+     cy.get('input[name="title"]').should('have.value', randomTitle)
+      
+     // Check  that the issue type "Task" is already selected
+     cy.get('[data-testid="select:type"]').should('have.text','Task')
+     
+      // Set the priority to Low
+      cy.get('[data-testid="select:priority"]').click()
+      cy.get('[data-testid="select-option:Low"]').click()
+
+     // Select reporter as Baby Yoda
+     cy.get('[data-testid="select:reporterId"]').click()
+     cy.get('[data-testid="select-option:Baby Yoda"]').click()
+
+     // Click on button "Create issue"
+      cy.get('button[type="submit"]').click()
   });
-});
+
+  // Assert that modal window is closed and successful message is visible
+  cy.get('[data-testid="modal:issue-create"]').should('not.exist')
+  cy.contains('Issue has been successfully created.').should('be.visible')
+
+  // Reload the page to see the recently created issue
+  cy.reload();
+  cy.contains('Issue has been successfully created.').should('not.exist')
+
+  // Assert that the issue is in the backlog list
+  cy.get('[data-testid="board-list:backlog"]')
+    .should('be.visible')
+    .and('have.length', '1')
+    .within(() => {
+    cy.get('[data-testid="list-issue"]')
+      .should('have.length', '5')
+      .first()
+      .find('p')
+      .contains(randomTitle)
+      .siblings()
+      .within(() => {
+      })
+    })
+  })
+})
