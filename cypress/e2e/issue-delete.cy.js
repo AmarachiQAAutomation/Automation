@@ -2,8 +2,7 @@ describe('Issue delete', () => {
   beforeEach(() => {
     cy.visit('/');
     cy.url()
-      .should('eq', `${Cypress.env('baseUrl')}project/board`)
-      .then((url) => {
+      .should('eq', `${Cypress.env('baseUrl')}project/board`).then((url) => {
          // System will already open issue details modal in before-Each block
          cy.visit(url + '/board?modal-issue-details=true')
          cy.contains('This is an issue of type: Task.').click();
