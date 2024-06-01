@@ -25,10 +25,11 @@ it('Should delete an issue and validate it is no longer visible on the board', (
      .click()
     
      // Verify that the confirmation dialog is no longer visible
-     cy.get('[data-testid="modal:confirm"]').should('not.exist');
+     cy.get('[data-testid="modal:confirm"]').should('not.exist')
 
     // Verify that the deleted issue is no longer visible on the board
        cy.get('[data-testid="board-list:backlog"]').should('not.contain', 'This is an issue of type: Task.')
+
       })
 
 it('should initiate issue delete and cancel it',() => {
@@ -37,17 +38,18 @@ it('should initiate issue delete and cancel it',() => {
         .find('[data-testid="icon:trash"]')
         .click();
 
-     // Confirm the apperance of a confirmation dialog
+     // Confirm the appearance of a confirmation dialog
      // confirm cancellation by clicking the cancel button
      cy.get('[data-testid="modal:confirm"]').should('be.visible')
          .contains('button', 'Cancel')
          .click() 
 
      // Verify that the confirmation dialog is no longer visible
-     cy.get('[data-testid="modal:confirm"]').should('not.exist');
+     cy.get('[data-testid="modal:confirm"]').should('not.exist')
 
      // Verify that the cancelled issue is visible on the board
-     cy.get('[data-testid="board-list:backlog"]').should('contain', 'This is an issue of type: Task.');
+     cy.get('[data-testid="board-list:backlog"]').should('contain', 'This is an issue of type: Task.')
+   
    })
    
 })
