@@ -102,8 +102,8 @@ describe('Time Tracking Functionality', () => {
      // Log time and confirm visiblity
      cy.get('[data-testid="modal:issue-details"]').within(() => {
       cy.get(('[data-testid="icon:stopwatch"]')).click();
-      cy.get('input[placeholder="Number"]').eq(0).clear({ force: true }).type(timeSpent)
-      cy.get('input[placeholder="Number"]').eq(1).clear({ force: true }).type(timeRemaining)
+      cy.get('input[placeholder="Number"]').eq(0).clear().type(timeSpent)
+      cy.get('input[placeholder="Number"]').eq(1).clear().type(timeRemaining)
        cy.contains(`Spent time: ${timeSpent}`).should('be.visible');
       cy.contains(`Remaining time: ${timeRemaining}`).should('be.visible')
       cy.contains('button', 'Done').click({ force: true }).should('not.exist');
