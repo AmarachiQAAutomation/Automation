@@ -1,17 +1,15 @@
 // Import Faker
-const faker = require('faker')
-
+import { faker } from '@faker-js/faker';
 describe('Issue create', () => {
   beforeEach(() => {
     cy.visit('/');
     cy.url()
       .should('eq', `${Cypress.env('baseUrl')}project/board`)
       .then((url) => {
-        // System will already open issue creating modal in beforeEach block
+        // System will already open issue creating modal in before-Each block
         cy.visit(url + '/board?modal-issue-create=true');
       });
   });
-
   it('Should create an issue and validate it successfully', () => {
     // System finds modal for creating issue and does next steps inside of it
     cy.get('[data-testid="modal:issue-create"]').within(() => {
@@ -51,7 +49,7 @@ describe('Issue create', () => {
     cy.reload();
     cy.contains('Issue has been successfully created.').should('not.exist');
 
-    // Assert than only one list with name Backlog is visible and do steps inside of it
+    //Assert that only one list with name Backlog is visible and do steps inside of it
     cy.get('[data-testid="board-list:backlog"]')
       .should('be.visible')
       .and('have.length', '1')
@@ -74,27 +72,25 @@ describe('Issue create', () => {
       .contains('TEST_TITLE')
       .within(() => {
         // Assert that correct avatar and type icon are visible
-        cy.get('[data-testid="avatar:Pickle Rick"]').should('be.visible');
-        cy.get('[data-testid="icon:story"]').should('be.visible');
-      });
-  });
-
+        cy.get('[data-testid="avatar:Pickle Rick"]').should('be.visible')
+        cy.get('[data-testid="icon:story"]').should('be.visible')
+      })
+  })
+  
   it('Should validate title is required field if missing', () => {
     // System finds modal for creating issue and does next steps inside of it
     cy.get('[data-testid="modal:issue-create"]').within(() => {
       // Try to click create issue button without filling any data
       cy.get('button[type="submit"]').click();
-
       // Assert that correct error message is visible
       cy.get('[data-testid="form-field:title"]').should('contain', 'This field is required');
-
     })
- })
- it('Should create a Bug issue and validate it successfully', () => {
+  })
+  it('Should create a Bug issue and validate it successfully', () => {
        //  Ensure Modal is visible 
        cy.get('[data-testid="modal:issue-create"]', { timeout: 60000 }).within(() => {
         
-        //Type value to the descrption input field
+        //Type value to the description input field
         cy.get('.ql-editor').type('My bug description');
         cy.get('.ql-editor').should('have.text', 'My bug description')
       
@@ -122,7 +118,7 @@ describe('Issue create', () => {
        // Click on button "Create issue button"
        cy.get('button[type="submit"]').click({ force: true });
       })
-    // Add delay to wait for modal to close
+    // wait for modal to close
         cy.wait(5000)
       
     // Assert that modal window is closed and successful message is visible
@@ -149,10 +145,9 @@ describe('Issue create', () => {
          cy.get('[data-testid="avatar:Lord Gaben"]').should('be.visible')
          cy.get('[data-testid="icon:bug"]').should('be.visible')
         })
-      })
-   })  
-  
-it('Should create a Task issue with random data and validate it successfully', () => {
+     })
+    
+  it('Should create a Task issue with random data and validate it successfully', () => {
    // Generate random title and description
     const randomTitle = faker.lorem.word(6)
     const randomDescription = faker.lorem.words(8)
@@ -190,10 +185,14 @@ it('Should create a Task issue with random data and validate it successfully', (
   cy.contains('Issue has been successfully created.').should('not.exist')
 
   // Assert that the issue is in the backlog list
-  cy.get('[data-testid="board-list:backlog"]')
-    .should('be.visible')
+      cy.get('[data-testid="board-list:backlog"]')
+      cy.get('[data-testid="list-issue"]')
+        .should('contain', randomTitle)
+        .should('be.visible')
     .and('have.length', '1')
     .within(() => {
+   // Assert that this list contains 5 issues and first element with tag p has specified text
+
     cy.get('[data-testid="list-issue"]')
       .should('have.length', '5')
       .first()
@@ -202,6 +201,43 @@ it('Should create a Task issue with random data and validate it successfully', (
       .siblings()
       .within(() => {
       })
+      // Assert that this list contains 5 issues and first element with tag p has specified text
+        cy.get('[data-testid="list-issue"]')
+          .should('have.length', '5')
+          .first()
+          .find('p')
+          .contains(randomTitle)
+          .siblings()
+          .within(() => {
+            //Assert that correct avatar and type icon are visible
+            cy.get('[data-testid="avatar:Pickle Rick"]').should('be.visible');
+            cy.get('[data-testid="icon:story"]').should('be.visible');
+      })
     })
+      // Function to create a new issue (assume it exists)
+      const createIssue = (title) => {
+       cy.get('[data-testid="create-issue-button"]').click();
+      cy.get('textarea[placeholder="Short summary"]').type(title);
+       cy.contains('button', 'Create').click();
+  };
+
+  // Function to access the board (assume it exists)
+  const getBoard = () => cy.get('[data-testid="board-view"]');
+
+  it('Should remove unnecessary spaces from issue title on the board', () => {
+    const titleWithSpaces = '  Hello   world!  '; // Title with multiple spaces
+    const expectedTitle = 'Hello world!'; // Expected title after trimming spaces
+
+    // Create an issue with the title containing extra spaces
+    createIssue(titleWithSpaces);
+
+    // Access the created issue title on the board
+    getBoard().within(() => {
+      // The newly created issue will be the first in the backlog
+      cy.get('[data-testid="issue-title"]').first().invoke('text').then((actualTitle) => {
+        // Trim the actual title and compare with expected title
+        expect(actualTitle.trim()).to.equal(expectedTitle);
+      });
+    });
   })
 })

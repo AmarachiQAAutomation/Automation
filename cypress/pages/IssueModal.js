@@ -116,6 +116,7 @@ class IssueModal {
         cy.get(this.issueDetailModal).get(this.closeDetailModalButton).first().click();
         cy.get(this.issueDetailModal).should('not.exist');
     }
-}
+  }
+
 
 export default new IssueModal();
