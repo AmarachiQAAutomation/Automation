@@ -1,9 +1,13 @@
 import { faker } from "@faker-js/faker";
 import IssueModal from "../pages/IssueModal";
-import { values } from "lodash"
-values
 describe('Time Tracking Functionality', () => {
-  const randomTitle = faker.lorem.words(6);
+  beforeEach(() => {
+    cy.visit('/');
+    cy.url().should('eq', `${Cypress.env('baseUrl')}project/board`).then((url) => {
+      cy.visit(url + '/board');
+      cy.visit(url + '/board?modal-issue-create=true');
+    });
+     const randomTitle = faker.lorem.words(6);
   const randomDescription = faker.lorem.words(8);
   const issueDetails = {
     title: "TIMETRACKING_TITLE",
@@ -11,25 +15,19 @@ describe('Time Tracking Functionality', () => {
     description: randomDescription,
     assignee: "Lord Gaben",
   };
-  const EXPECTED_AMOUNT_OF_ISSUES = '5';
-  const originalEstimateHours = 'input[placeholder="Number"]';
-  const estimateTime = '10';
-  const updatedEstimateTime = '20';
- 
-  
-
-  beforeEach(() => {
-    cy.visit('/');
-    cy.url().should('eq', `${Cypress.env('baseUrl')}project/board`).then((url) => {
-      cy.visit(url + '/board');
-      cy.visit(url + '/board?modal-issue-create=true');
-    });
-    
+       const EXPECTED_AMOUNT_OF_ISSUES = '5';
+      
     // Create new issue
     IssueModal.createIssue(issueDetails);
     IssueModal.ensureIssueIsCreated(EXPECTED_AMOUNT_OF_ISSUES, issueDetails);
-  });
-  it.only('Should add, update, and remove estimation successfully', () => {
+})
+  
+    const originalEstimateHours = 'input[placeholder="Number"]';
+       const estimateTime = '10';
+       const updatedEstimateTime = '20';
+
+  
+  it('Should add, update, and remove estimation successfully', () => {
     // Open the newly created issue and click on the first issue in the backlog
     cy.get('[data-testid="board-list:backlog"]', { timeout: 60000 }).should('be.visible').within(() => {
       cy.get('[data-testid="list-issue"]').contains('TIMETRACKING_TITLE').click();
