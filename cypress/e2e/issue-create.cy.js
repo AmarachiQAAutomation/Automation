@@ -9,10 +9,10 @@ describe('Issue create', () => {
         // System will already open issue creating modal in before-Each block
         cy.visit(url + '/board?modal-issue-create=true');
       });
-  });
+  
   it('Should create an issue and validate it successfully', () => {
-    // System finds modal for creating issue and does next steps inside of it
-    cy.get('[data-testid="modal:issue-create"]').within(() => {
+      // System finds modal for creating issue and does next steps inside of it
+      cy.get('[data-testid="modal:issue-create"]').within(() => {
       // Type value to description input field
       cy.get('.ql-editor').type('TEST_DESCRIPTION');
       cy.get('.ql-editor').should('have.text', 'TEST_DESCRIPTION');
@@ -77,7 +77,7 @@ describe('Issue create', () => {
       })
   })
   
-  it('Should validate title is required field if missing', () => {
+ it('Should validate title is required field if missing', () => {
     // System finds modal for creating issue and does next steps inside of it
     cy.get('[data-testid="modal:issue-create"]').within(() => {
       // Try to click create issue button without filling any data
@@ -85,11 +85,11 @@ describe('Issue create', () => {
       // Assert that correct error message is visible
       cy.get('[data-testid="form-field:title"]').should('contain', 'This field is required');
     })
-  })
+ })
   it('Should create a Bug issue and validate it successfully', () => {
        //  Ensure Modal is visible 
        cy.get('[data-testid="modal:issue-create"]', { timeout: 60000 }).within(() => {
-        
+         
         //Type value to the description input field
         cy.get('.ql-editor').type('My bug description');
         cy.get('.ql-editor').should('have.text', 'My bug description')
@@ -144,13 +144,13 @@ describe('Issue create', () => {
         .within(() => {
          cy.get('[data-testid="avatar:Lord Gaben"]').should('be.visible')
          cy.get('[data-testid="icon:bug"]').should('be.visible')
-        })
-     })
-    
+        })  
+      })
+    })
   it('Should create a Task issue with random data and validate it successfully', () => {
-   // Generate random title and description
-    const randomTitle = faker.lorem.word(6)
-    const randomDescription = faker.lorem.words(8)
+     // Generate random title and description
+      const randomTitle = faker.lorem.word(6)
+     const randomDescription = faker.lorem.words(8)
     // Ensure modal is visible
      cy.get('[data-testid="modal:issue-create"]', { timeout: 60000 }).within(() => {
      //Fill in description
@@ -212,32 +212,35 @@ describe('Issue create', () => {
             //Assert that correct avatar and type icon are visible
             cy.get('[data-testid="avatar:Pickle Rick"]').should('be.visible');
             cy.get('[data-testid="icon:story"]').should('be.visible');
-      })
-    })
-      // Function to create a new issue (assume it exists)
-      const createIssue = (title) => {
-       cy.get('[data-testid="create-issue-button"]').click();
-      cy.get('textarea[placeholder="Short summary"]').type(title);
-       cy.contains('button', 'Create').click();
-  };
+          })
+        })
+     })
+})
+     it('Should remove unnecessary spaces from issue title on the board', () => {
+    const titleWithSpaces = '  Hello   world!  ' // Title with multiple spaces
+    const expectedTitle = 'Hello world!';
 
-  // Function to access the board (assume it exists)
-  const getBoard = () => cy.get('[data-testid="board-view"]');
-
-  it('Should remove unnecessary spaces from issue title on the board', () => {
-    const titleWithSpaces = '  Hello   world!  '; // Title with multiple spaces
-    const expectedTitle = 'Hello world!'; // Expected title after trimming spaces
+    // Function to create an issue with the title containing extra spaces
+    const createIssue = (title) => {
+      cy.get('[data-testid="modal:issue-create"]').within(() => {
+        cy.get('input[name="title"]').type(title);
+        cy.get('button[type="submit"]').click();
+      });
+    };
 
     // Create an issue with the title containing extra spaces
-    createIssue(titleWithSpaces);
+    createIssue(titleWithSpaces)
 
-    // Access the created issue title on the board
-    getBoard().within(() => {
+     // Access the created issue title on the board
+     cy.get('[data-testid="board-list:backlog"]').within(() => {
       // The newly created issue will be the first in the backlog
-      cy.get('[data-testid="issue-title"]').first().invoke('text').then((actualTitle) => {
+      cy.get('[data-testid="list-issue"]').first().invoke('text').then((actualTitle) => {
+        // Log the actual title for debugging
+        cy.log('Actual Title:', actualTitle);
         // Trim the actual title and compare with expected title
         expect(actualTitle.trim()).to.equal(expectedTitle);
-      });
-    });
+        
+      })
+    })
   })
 })
